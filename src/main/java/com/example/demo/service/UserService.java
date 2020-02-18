@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
 
+import com.example.demo.dao.LoginTicketMapper;
 import com.example.demo.dao.UserMapper;
+import com.example.demo.entity.LoginTicket;
 import com.example.demo.entity.User;
 import com.example.demo.util.DemoUtil;
 import com.example.demo.util.MailClient;
@@ -17,11 +19,18 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import static com.example.demo.util.DemoConstant.ACTIVATION_FAILURE;
+import static com.example.demo.util.DemoConstant.ACTIVATION_REPEAT;
+import static com.example.demo.util.DemoConstant.ACTIVATION_SUCCESS;
+
 @Service
 public class UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
 
     @Autowired
     private MailClient mailClient;
@@ -111,11 +120,74 @@ public class UserService {
 
 //http://localhost:8080/demo/activation/101/code
         String content=templateEngine.process("/mail/activation",context);
-        mailClient.sendMail(user.getEmail(),"激活账号",content);
+      //  mailClient.sendMail(user.getEmail(),"激活账号",content);
+        new Thread(()->{
+            mailClient.sendMail(user.getEmail(),"激活账号",content);
+        }).start();
+
         return map;
     }
 
 
+    public Map<String,Object> login(String username,String password,int expiredSeconds){
+        HashMap<String, Object> map = new HashMap<>();
+
+        if(StringUtils.isBlank(username)){
+            map.put("usernameMsg","用户名不能为空！");
+            return map;
+        }
+        if(StringUtils.isBlank(password)){
+            map.put("passwordMsg","密码不能为空！");
+            return map;
+        }
+        //验证用户名
+        User user = userMapper.selectByName(username);
+        if(user==null){
+            map.put("usernameMsg","用户名不存在！");
+            return map;
+        }
+        //验证用户是否激活
+        if(user.getStatus()==0){
+            map.put("usernameMsg","账号未激活!");
+            return map;
+        }
+        //验证密码是否正确
+        if(!user.getPassword().equals(DemoUtil.md5(password+user.getSalt()))){
+            map.put("passwordMsg","密码不正确！");
+            return map;
+        }
+        //添加登录凭证
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(user.getId());
+        loginTicket.setStatus(0);
+        loginTicket.setExpired
+                (new Date(System.currentTimeMillis()+expiredSeconds*1000));
+        loginTicket.setTicket(DemoUtil.generateUUID());
+
+        loginTicketMapper.insertTicket(loginTicket);
+        map.put("ticket",loginTicket.getTicket());
+        return map;
+
+    }
 
 
+    public int activation(int userId,String code){
+        User user=userMapper.selectById(userId);
+        //重复激活
+        if(user.getStatus()==1){
+            return ACTIVATION_REPEAT;
+        }
+        if(user.getActivationCode().equals(code)){
+            //激活用户
+            userMapper.updateStatus(userId,1);
+            return ACTIVATION_SUCCESS;
+        }
+        return ACTIVATION_FAILURE;
+    }
+
+
+
+    public void logout(String ticket) {
+        loginTicketMapper.updateTicketStatus(ticket,1);
+    }
 }
