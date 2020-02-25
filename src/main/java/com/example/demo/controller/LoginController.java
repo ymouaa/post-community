@@ -100,12 +100,15 @@ public class LoginController {
         //检查账号密码
         //勾上记住，过期时间 12小时或100天 即cookie的时间
         int expiredSecond=remember?REMEMBER_EXPIRED_SECONDS:DEFALUT_EXPIRED_SECONDS;
+         //System.out.println(expiredSecond);
+         //      System.out.println(expiredSecond/24/3600);
         Map<String, Object> map = userService.login(username, password, expiredSecond);
         //如果登录成功，将登录凭证通过cookie传到浏览器
         if(map.containsKey("ticket")){
             Cookie cookie=new Cookie("ticket",map.get("ticket").toString());
             cookie.setPath(contextPath);//有效路径
             cookie.setMaxAge(expiredSecond);
+            cookie.setHttpOnly(true);
             response.addCookie(cookie);
             return "redirect:/index";
         }else{
@@ -122,7 +125,7 @@ public class LoginController {
     @RequestMapping(path = "/logout",method = RequestMethod.GET)
     public String logout(@CookieValue("ticket") String ticket){
         userService.logout(ticket);
-        return "redirect/login";
+        return "redirect:/login";
     }
 
     /*****

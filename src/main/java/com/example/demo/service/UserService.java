@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -163,7 +164,12 @@ public class UserService {
         loginTicket.setExpired
                 (new Date(System.currentTimeMillis()+expiredSeconds*1000));
         loginTicket.setTicket(DemoUtil.generateUUID());
-
+        Date date = loginTicket.getExpired();
+        String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+        System.out.println(
+                "=========================="
+        );
+        System.out.println(format);
         loginTicketMapper.insertTicket(loginTicket);
         map.put("ticket",loginTicket.getTicket());
         return map;
@@ -185,9 +191,25 @@ public class UserService {
         return ACTIVATION_FAILURE;
     }
 
+    public LoginTicket findLoginTicket(String ticket){
+        return loginTicketMapper.selectByTicket(ticket);
+    }
 
 
     public void logout(String ticket) {
         loginTicketMapper.updateTicketStatus(ticket,1);
     }
+
+
+    //修改头像headerUrl
+    public int updateHeader(int userId,String headerUrl){
+        return userMapper.updateHeader(userId,headerUrl);
+    }
+
+
+    //修改密码
+    public int updatePassword(int userId,String password){
+        return userMapper.updatePassword(userId,password);
+    }
+
 }

@@ -2,6 +2,7 @@ package com.example.demo.util;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Base64Utils;
 import org.springframework.util.DigestUtils;
 
 import java.util.UUID;
@@ -44,4 +45,6 @@ public class DemoUtil {
         }
         return DigestUtils.md5DigestAsHex(key.getBytes());
      }
+
+
 }
