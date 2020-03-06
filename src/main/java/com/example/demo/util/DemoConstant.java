@@ -31,4 +31,15 @@ public interface DemoConstant {
      */
     int REMEMBER_EXPIRED_SECONDS=3600*24*100;
 
+
+    /**
+     * 评论的类型: 回复帖子的评论 1
+     */
+    int ENTITY_TYPE_DISCUSSPOST = 1;
+
+
+    /**
+     * 评论的类型: 回复评论的评论 2
+     */
+    int ENTITY_TYPE_COMMENT = 2;
 }

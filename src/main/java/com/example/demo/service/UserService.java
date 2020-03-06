@@ -122,9 +122,7 @@ public class UserService {
 //http://localhost:8080/demo/activation/101/code
         String content=templateEngine.process("/mail/activation",context);
       //  mailClient.sendMail(user.getEmail(),"激活账号",content);
-        new Thread(()->{
-            mailClient.sendMail(user.getEmail(),"激活账号",content);
-        }).start();
+        new Thread(() -> mailClient.sendMail(user.getEmail(), "激活账号", content)).start();
 
         return map;
     }
@@ -166,10 +164,6 @@ public class UserService {
         loginTicket.setTicket(DemoUtil.generateUUID());
         Date date = loginTicket.getExpired();
         String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
-        System.out.println(
-                "=========================="
-        );
-        System.out.println(format);
         loginTicketMapper.insertTicket(loginTicket);
         map.put("ticket",loginTicket.getTicket());
         return map;
@@ -195,7 +189,7 @@ public class UserService {
         return loginTicketMapper.selectByTicket(ticket);
     }
 
-
+    // 退出登录
     public void logout(String ticket) {
         loginTicketMapper.updateTicketStatus(ticket,1);
     }
@@ -212,4 +206,8 @@ public class UserService {
         return userMapper.updatePassword(userId,password);
     }
 
+
+    public User findUserByName(String username) {
+        return userMapper.selectByName(username);
+    }
 }

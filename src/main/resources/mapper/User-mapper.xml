@@ -10,6 +10,7 @@ resultType 应该要写包名+类名
 
 
 -->
+<!--suppress ALL -->
 <mapper namespace="com.example.demo.dao.UserMapper">
 
     <!--

@@ -2,11 +2,14 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--suppress ALL -->
 <mapper namespace="com.example.demo.dao.DiscussPostMapper">
     <sql id="selectFields">
       id,user_id,title,content,type,status,create_time,comment_count,score
     </sql>
-
+    <sql id="insertFields">
+        user_id,title,content,type,status,create_time,comment_count,score
+    </sql>
     <select id="selectDiscussPost" resultType="DiscussPost">
         select <include refid="selectFields"></include>
         from discuss_post
@@ -18,10 +21,6 @@
         order by type desc ,create_time desc
         limit #{offset},#{limit}
     </select>
-
-
-
-
     <!--
         这里还是要写 resultType=""
         不然会出错
@@ -35,4 +34,21 @@
          </if>
     </select>
 
+    <select id="selectDiscussPostById" resultType="DiscussPost">
+        select
+        <include refid="selectFields"></include>
+        from discuss_post where id=#{id}
+    </select>
+
+
+    <insert id="insertDiscussPost" parameterType="DiscussPost">
+        insert into discuss_post (<include refid="insertFields"></include>)
+        values(
+        #{userId},#{title},#{content},#{type},#{status},#{createTime},#{commentCount},#{score}
+        )
+    </insert>
+
+    <update id="updateCommentCount" parameterType="DiscussPost">
+        update discuss_post set comment_count = #{commentCount} where id = #{id}
+    </update>
 </mapper>

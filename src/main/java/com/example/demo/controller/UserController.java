@@ -79,20 +79,25 @@ public class UserController {
             throw new RuntimeException("上传文件失败，服务器异常",e);
         }
         //更新头像
-        User user = hostHolder.get();//获取当前登录的用户
+        User user = hostHolder.getUser();//获取当前登录的用户
         String headerUrl=domain+contextPath+"/user/header/"+filename;
         userService.updateHeader(user.getId(),headerUrl);
         return "redirect:/index";
     }
+
+
+    /**
+     * 获取头像
+     */
     @RequestMapping(path = "/header/{filename}",method = RequestMethod.GET)
-    public void getHeader(@PathVariable(name = "filename")String filename,HttpServletResponse response){
+    public void getHeader(@PathVariable(name = "filename")String filename, HttpServletResponse response){
         filename=uploadPath+"/"+filename;
-        System.out.println(filename);
+        //System.out.println(filename);
         String suffex=filename.substring(filename.lastIndexOf("."));
         response.setContentType("image/"+suffex);
         try (
                 ServletOutputStream out = response.getOutputStream();
-                FileInputStream fis=new FileInputStream(filename);
+                FileInputStream fis = new FileInputStream(filename)
         ) {
             byte []buf=new byte[1024];
             int len=0;
@@ -123,14 +128,16 @@ public class UserController {
             model.addAttribute("newpwdMsg","新密码和旧密码不能相同");
             return "/site/setting";
         }
-        User user = hostHolder.get();
+        User user = hostHolder.getUser();
         if(!user.getPassword().equals(DemoUtil.md5(oldpassword+user.getSalt()))) {
             model.addAttribute("oldpwdMsg","旧密码不正确");
             return "/site/setting";
         }
         userService.updatePassword(user.getId(),DemoUtil.md5(newpassword+user.getSalt()));
-//这里选择把ticket设为1
+        //这里选择把ticket设为1
         userService.logout(ticket);
         return "redirect:/index";
     }
+
+
 }

@@ -15,9 +15,10 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.Enumeration;
 
 @Component
-public class LoginTicketInterceptor implements HandlerInterceptor{
+public class LoginTicketInterceptor implements HandlerInterceptor {
 
     @Autowired
     private UserService userService;
@@ -27,13 +28,41 @@ public class LoginTicketInterceptor implements HandlerInterceptor{
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //通过cookie得到ticket
+//        Enumeration<String> headerNames = request.getHeaderNames();
+//        while (headerNames.hasMoreElements()){
+//            String name = headerNames.nextElement();
+//            Enumeration<String> headers = request.getHeaders(name);
+//            if(headers!=null){
+//                System.out.print(name+" : ");
+//                while (headers.hasMoreElements()){
+//                    String headerValue = headers.nextElement();
+//                    System.out.print(headerValue+",");
+//                }
+//                System.out.println();
+//            }
+//        }
+//
+//
+//        Enumeration<String> parameterNames = request.getParameterNames();
+//        while (parameterNames.hasMoreElements()) {
+//            String name = parameterNames.nextElement();
+//            String[] values = request.getParameterValues(name);
+//            System.out.print(name + " : ");
+//            if (values != null) {
+//
+//                for (String string : values) {
+//                    System.out.print(string + ",");
+//                }
+//                System.out.println();
+//            }
+//        }
         String ticket = CookieUtil.getValue(request, "ticket");
-        if(ticket!=null){
+        if (ticket != null) {
             LoginTicket loginTicket = userService.findLoginTicket(ticket);
-            if(loginTicket!=null&&loginTicket.getStatus()==0&&loginTicket.getExpired().after(new Date())){
+            if (loginTicket != null && loginTicket.getStatus() == 0 && loginTicket.getExpired().after(new Date())) {
                 User user = userService.findUserById(loginTicket.getUserId());
                 //本次请求中持有用户
-                hostHolder.set(user);
+                hostHolder.setUser(user);
             }
         }
         return true;
@@ -42,14 +71,14 @@ public class LoginTicketInterceptor implements HandlerInterceptor{
     //模板前
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {
-        User user = hostHolder.get();
-        if(user!=null&&modelAndView!=null){
-            modelAndView.addObject("loginUser",user);
+        User user = hostHolder.getUser();
+        if (user != null && modelAndView != null) {
+            modelAndView.addObject("loginUser", user);
         }
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
-        hostHolder.clear();
+        hostHolder.clearUser();
     }
 }

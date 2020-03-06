@@ -6,16 +6,16 @@ import com.example.demo.entity.Page;
 import com.example.demo.entity.User;
 import com.example.demo.service.DiscussPostService;
 import com.example.demo.service.UserService;
+import com.example.demo.util.DemoUtil;
+import com.example.demo.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class HomeController {
@@ -26,6 +26,9 @@ public class HomeController {
     @Autowired
     private DiscussPostService discussPostService;
 
+
+    @Autowired
+    private HostHolder hostHolder;
 
     @RequestMapping(path = "/index", method = RequestMethod.GET)
     public String getIndexPage(Model model, Page page) {
@@ -47,6 +50,11 @@ public class HomeController {
         }
         model.addAttribute("discussPosts", discussPosts);
         return "/index";
-
     }
+
+    @RequestMapping(path = "/error", method = RequestMethod.GET)
+    public String getErrorPage() {
+        return "/error/500";
+    }
+
 }

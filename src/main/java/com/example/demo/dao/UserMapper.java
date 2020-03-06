@@ -12,14 +12,6 @@ import org.springframework.stereotype.Repository;
 @Mapper
 public interface UserMapper {
 
-    /*
-    * @Select("SELECT * FROM CITY WHERE state = #{state}")
-            City findByState(@Param("state") String state);
-    *
-    * */
-   // @Select("select * from user where id =#{id}")
-
-
     User selectById(int id);
 
     User selectByName(String username);

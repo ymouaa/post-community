@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.service.AlphaService;
+import com.example.demo.util.DemoUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
@@ -98,10 +99,6 @@ public class AlphaController {
     }
 
 
-
-
-
-
     //json
     //  字符串
     @RequestMapping("/emps")
@@ -127,7 +124,14 @@ public class AlphaController {
     }
 
 
-
+    // ajax示例
+    @RequestMapping(path = "/ajax", method = RequestMethod.POST)
+    @ResponseBody
+    public String testAjax(String name, int age) {
+        System.out.println(name);
+        System.out.println(age);
+        return DemoUtil.getJSONString(0, "操作成功!");
+    }
 
 }
 
