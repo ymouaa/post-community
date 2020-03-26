@@ -5,7 +5,9 @@ import com.example.demo.entity.DiscussPost;
 import com.example.demo.entity.Page;
 import com.example.demo.entity.User;
 import com.example.demo.service.DiscussPostService;
+import com.example.demo.service.LikeService;
 import com.example.demo.service.UserService;
+import com.example.demo.util.DemoConstant;
 import com.example.demo.util.DemoUtil;
 import com.example.demo.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +20,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.*;
 
 @Controller
-public class HomeController {
+public class HomeController implements DemoConstant {
 
     @Autowired
     private UserService userService;
 
     @Autowired
     private DiscussPostService discussPostService;
+
+    @Autowired
+    private LikeService likeService;
 
 
     @Autowired
@@ -45,6 +50,17 @@ public class HomeController {
                 map.put("post", post);
                 User user = userService.findUserById(post.getUserId());
                 map.put("user", user);
+
+                //帖子的点赞
+                long postLikeCount = likeService.findEntityLikeCount(ENTITY_TYPE_DISCUSSPOST, post.getId());
+
+                //帖子的点赞状态
+                int postLikeStatus = hostHolder.getUser() == null ? 0
+                        : likeService.findEntityLikeStatus(hostHolder.getUser().getId(), ENTITY_TYPE_DISCUSSPOST, post.getId());
+
+                map.put("postLikeCount", postLikeCount);
+                map.put("postLikeStatus", postLikeStatus);
+
                 discussPosts.add(map);
             }
         }

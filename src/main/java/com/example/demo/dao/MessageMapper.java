@@ -41,4 +41,20 @@ public interface MessageMapper {
     // 所以直接传ids来改，删除消息也用这个函数
     int updateMessage(@Param("ids") List<Integer> ids, @Param("status") int status);
 
+
+    // 查询某个主题下的最新通知
+    Message selectLatestNotice(@Param("userId") int userId, @Param("topic") String topic);
+
+    // 查询某个主题所包含的通知数量
+    int selectNoticeCount(@Param("userId") int userId, @Param("topic") String topic);
+
+    // 查询未读的通知数量
+    int selectUnreadCount(@Param("userId") int userId, @Param("topic") String topic);
+
+    // 某个主题包含的通知列表
+    List<Message> selectNotices(@Param("userId") int userId, @Param("topic") String topic, @Param("offset") int offset, @Param("limit") int limit);
+
+
+
+
 }

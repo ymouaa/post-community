@@ -29,7 +29,7 @@
 				</h6>
 				<!-- 作者 -->
 				<div class="media pb-3 border-bottom">
-					<a href="profile.html">
+					<a th:href="@{|/user/profile/${user.id}|}">
 						<img th:src="${user.headerUrl}" class="align-self-start mr-4 rounded-circle user-header"
 							 alt="用户头像">
 					</a>
@@ -39,7 +39,12 @@
 							发布于<b th:text="${#dates.format(post.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15
 							15:32:18</b>
 							<ul class="d-inline float-right">
-								<li class="d-inline ml-2"><a href="#" class="text-primary">赞 11</a></li>
+								<li class="d-inline ml-2">
+									<a href="javascrpit:;" th:onclick="|like(this,1,${post.id},${user.id},${post.id})|"
+									   class="text-primary">
+										<b th:text="${likeStatus==1?'已赞':'赞'}">赞</b><i th:text="${likeCount}">11</i>
+									</a>
+								</li>
 								<li class="d-inline ml-2">|</li>
 								<li class="d-inline ml-2"><a href="#replyform" class="text-primary">回帖 <span
 										th:text="${post.commentCount}"></span></a></li>
@@ -67,7 +72,7 @@
 				<ul class="list-unstyled mt-4" th:each="cvo:${comments}">
 					<!-- 第1条回帖 -->
 					<li class="media pb-3 pt-3 mb-3 border-bottom">
-						<a href="profile.html">
+						<a th:href="@{|/user/profile/${cvo.user.id}|}">
 							<img th:src="${cvo.user.headerUrl}" class="align-self-start mr-4 rounded-circle user-header"
 								 alt="用户头像">
 						</a>
@@ -90,7 +95,14 @@
 									<b th:text="${#dates.format(cvo.comment.createTime,'yyyy-MM-dd HH:mm:ss')}"></b>
 								</span>
 								<ul class="d-inline float-right">
-									<li class="d-inline ml-2"><a href="#" class="text-primary">赞(1)</a></li>
+									<li class="d-inline ml-2">
+										<a href="javascrpit:;"
+										   th:onclick="|like(this,2,${cvo.comment.id},${cvo.user.id},${post.id)|"
+										   class="text-primary">
+											<b th:text="${cvo.commentLikeStatus==1?'已赞':'赞'}">赞</b>(<i
+												th:text="${cvo.commentLikeCount}">1</i>)
+										</a>
+									</li>
 									<li class="d-inline ml-2">|</li>
                                     <li class="d-inline ml-2"><a th:href="|#huifu-${cvoStat.count}}|"
                                                                  class="text-primary">回复(
@@ -99,9 +111,9 @@
 							</div>
 							<!-- 回复列表 -->
 							<ul class="list-unstyled mt-4 bg-gray p-3 font-size-12 text-muted"
-								th:each="rvo:${cvo.replys}">
+							>
 								<!-- 第1条回复 -->
-								<li class="pb-3 pt-3 mb-3 border-bottom">
+								<li class="pb-3 pt-3 mb-3 border-bottom" th:each="rvo:${cvo.replys}">
 									<div>
 										<span th:if="${rvo.target==null}">
 											<b class="text-info" th:utext="${rvo.user.username}">寒江雪</b>:&nbsp;&nbsp;
@@ -121,7 +133,14 @@
 									<div class="mt-3">
 										<span th:text="${#dates.format(rvo.reply.createTime,'yyyy-MM-dd HH:mm:ss')}">2019-04-15 15:32:18</span>
 										<ul class="d-inline float-right">
-											<li class="d-inline ml-2"><a href="#" class="text-primary">赞(1)</a></li>
+											<li class="d-inline ml-2">
+												<a href="javascrpit:;"
+												   th:onclick="|like(this,2,${rvo.reply.id},${rvo.user.id},${post.id})|"
+												   class="text-primary">
+													<b th:text="${rvo.replyLikeStatus==1?'已赞':'赞'}">赞</b>(<i
+														th:text="${rvo.replyLikeCount}">1</i>)
+												</a>
+											</li>
 											<li class="d-inline ml-2">|</li>
                                             <li class="d-inline ml-2"><a th:href="|#huifu-${rvoStat.count}|"
                                                                          data-toggle="collapse"
@@ -148,7 +167,7 @@
 								</li>
 								<!-- 回复输入框 -->
                                 <li th:id="|huifu-${cvoStat.count}|" class="pb-3 pt-3">
-                                    <form th:action="@{|/comment/add|${post.id}|}" method="post">
+									<form th:action="@{|/comment/add/${post.id}|}" method="post">
 									<div>
                                         <input type="text" class="input-size" name="content" placeholder="请输入你的观点"/>
                                         <!--回复评论 类型为2-->
@@ -160,7 +179,6 @@
                                         <button type="submit" class="btn btn-primary btn-sm" onclick="#">&nbsp;&nbsp;回&nbsp;&nbsp;复&nbsp;&nbsp;</button>
 									</div>
                                     </form>
-                                    >
 								</li>
 							</ul>
 						</div>
@@ -265,5 +283,6 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
 	<script th:src="@{/js/global.js}"></script>
+	<script th:src="@{/js/discuss.js}"></script>
 </body>
 </html>

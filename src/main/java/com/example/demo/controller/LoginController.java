@@ -3,11 +3,17 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.User;
 import com.example.demo.service.UserService;
+import com.example.demo.util.DemoUtil;
+import com.example.demo.util.RedisKeyUtil;
 import com.google.code.kaptcha.Producer;
 import org.apache.commons.lang3.StringUtils;
 
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -23,12 +29,14 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static com.example.demo.util.DemoConstant.*;
 
 @Controller
 public class LoginController {
 
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
     private UserService userService;
@@ -38,6 +46,9 @@ public class LoginController {
 
     @Autowired
     private Producer kaptchaProducer;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     //注册
     @RequestMapping(path="/register",method = RequestMethod.GET)
@@ -87,21 +98,26 @@ public class LoginController {
     }
 
     @RequestMapping(path = "/login",method = RequestMethod.POST)
-    public String login(String username,String password,String code, boolean remember
-                        ,HttpSession session
-                        ,Model model
-                        ,HttpServletResponse response){
-        String kaptcha= (String) session.getAttribute("kaptcha");
+    public String login(String username, String password, String code, boolean remember
+                        /*,HttpSession session*/
+            , Model model
+            , HttpServletResponse response
+            , @CookieValue("KaptchaOwner") String kaptchaOwner) {
+        //String kaptcha= (String) session.getAttribute("kaptcha");
+        String kaptcha = null;
+        if (kaptchaOwner != null) {
+            String redisKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
+            kaptcha = (String) redisTemplate.opsForValue().get(redisKey);
+        }
         if(StringUtils.isBlank(kaptcha)||StringUtils.isBlank(code)||!code.equalsIgnoreCase(kaptcha)){
             model.addAttribute("codeMsg","验证码不正确！");
             return "/site/login";
         }
-
         //检查账号密码
         //勾上记住，过期时间 12小时或100天 即cookie的时间
         int expiredSecond=remember?REMEMBER_EXPIRED_SECONDS:DEFALUT_EXPIRED_SECONDS;
-         //System.out.println(expiredSecond);
-         //      System.out.println(expiredSecond/24/3600);
+        //System.out.println(expiredSecond);
+        //System.out.println(expiredSecond/24/3600);
         Map<String, Object> map = userService.login(username, password, expiredSecond);
         //如果登录成功，将登录凭证通过cookie传到浏览器
         if(map.containsKey("ticket")){
@@ -128,25 +144,50 @@ public class LoginController {
         return "redirect:/login";
     }
 
-    /*****
-     * 响应验证码请求
-     * */
+    /**
+     * 响应验证码请求 返回图片和cookie
+     */
     @RequestMapping(path="/kaptcha",method = RequestMethod.GET)
-    public void getKaptcha(HttpSession session, HttpServletResponse response){
+    public void getKaptcha(/*HttpSession session, */HttpServletResponse response) {
         //生成验证码
         String text=kaptchaProducer.createText();
         BufferedImage image = kaptchaProducer.createImage(text);
+
+
+        String owner = DemoUtil.generateUUID();
+        Cookie cookie = new Cookie("KaptchaOwner", owner);
+        //Sets the maximum age in seconds for this Cookie
+        // 60秒过期
+        cookie.setMaxAge(60);
+
+        //Specifies a path for the cookie to which the client should return the cookie.
+        /*
+        Specifies a path for the cookie to which the client should return the cookie.
+        The cookie is visible to all the pages in the directory you specify,
+        and all the pages in that directory's subdirectories.
+        A cookie's path must include the servlet that set the cookie,
+        for example, /catalog, which makes the cookie visible to all directories on the server under /catalog.
+        */
+        cookie.setPath(contextPath);
+        response.addCookie(cookie);
+
+        String redisKey = RedisKeyUtil.getKaptchaKey(owner);
+
+        redisTemplate.opsForValue().set(redisKey, text, 60, TimeUnit.SECONDS);
+
         //验证码存入session
-        session.setAttribute("kaptcha",text);
+        //session.setAttribute("kaptcha",text);
+
         //图片输出给浏览器
         response.setContentType("image/png");
         try {
             OutputStream out=response.getOutputStream();
             ImageIO.write(image,"png",out);
         } catch (IOException e) {
-            //logger.error("响应验证码失败"+e.getMessage());
+            logger.error("响应验证码失败" + e.getMessage());
         }
 
     }
+
 }
 

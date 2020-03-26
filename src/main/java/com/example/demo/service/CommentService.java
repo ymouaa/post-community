@@ -6,6 +6,7 @@ import com.example.demo.entity.Comment;
 import com.example.demo.entity.DiscussPost;
 import com.example.demo.util.DemoConstant;
 import com.example.demo.util.SensitiveFilter;
+import com.sun.mail.imap.protocol.ID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -35,6 +36,11 @@ public class CommentService implements DemoConstant {
     public int findCommentsRows(int entityType, int entityId) {
         return commentMapper.selectCountByEntity(entityType, entityId);
     }
+
+    public Comment findCommentById(int id) {
+        return commentMapper.selectCommentById(id);
+    }
+
 
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public int addComment(Comment comment) {

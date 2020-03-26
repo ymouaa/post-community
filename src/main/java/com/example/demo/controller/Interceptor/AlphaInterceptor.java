@@ -20,7 +20,7 @@ public class AlphaInterceptor implements HandlerInterceptor{
     //返回值false 不往下执行
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        logger.debug("preHandle"+handler.toString());
+        logger.debug(this.getClass().getName() + "  preHandle  " + handler.toString());
         return true;
     }
 
@@ -30,11 +30,11 @@ public class AlphaInterceptor implements HandlerInterceptor{
     //
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {
-        logger.debug("postHandle "+handler.toString());
+        logger.debug(this.getClass().getName() + "  postHandle " + handler.toString());
     }
     //模板引擎的之后执行
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
-        logger.debug("afterCompletion "+handler.toString());
+        logger.debug(this.getClass().getName() + "  afterCompletion " + handler.toString());
     }
 }

@@ -125,7 +125,7 @@
 						</a>
 						<div class="toast show d-lg-block" role="alert" aria-live="assertive" aria-atomic="true">
 							<div class="toast-header">
-                                <strong class="mr-auto" th:utext="${map.fromUser.username}">落基山脉下的闲人</strong>
+								<strong class="mr-auto" th:utext="${map.fromUser.id==1?'系统通知':map.fromUser.username}">落基山脉下的闲人</strong>
                                 <small th:text="${#dates.format(map.letter.createTime,'yyyy-MM-dd HH:mm:ss')}">
                                     2019-04-25 15:49:32
                                 </small>

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<ul>
+    <li th:each="map:${statuslist}">
+        <b th:text="|${map.status==0?'赞':map.status==1?'已赞':'已踩'}|"></b>
+    </li>
+</ul>
+</html>

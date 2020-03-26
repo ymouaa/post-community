@@ -9,6 +9,7 @@ import com.example.demo.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -28,7 +29,37 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
 
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         //通过cookie得到ticket
-//        Enumeration<String> headerNames = request.getHeaderNames();
+        String ticket = CookieUtil.getValue(request, "ticket");
+        if (ticket != null) {
+            LoginTicket loginTicket = userService.findLoginTicket(ticket);
+            if (loginTicket != null && loginTicket.getStatus() == 0 && loginTicket.getExpired().after(new Date())) {
+                User user = userService.findUserById(loginTicket.getUserId());
+                //本次请求中持有用户
+                hostHolder.setUser(user);
+            }
+        }
+//        HandlerMethod handlerMethod = (HandlerMethod) handler;
+//        if(!handlerMethod.getMethod().getName().equals("login")){
+//            request.getRequestDispatcher("/login").forward(request,response);
+//            return false;
+//        }
+        return true;
+    }
+
+    //模板前
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {
+        User user = hostHolder.getUser();
+        if (user != null && modelAndView != null) {
+            modelAndView.addObject("loginUser", user);
+        }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
+        hostHolder.clearUser();
+    }
+//            Enumeration<String> headerNames = request.getHeaderNames();
 //        while (headerNames.hasMoreElements()){
 //            String name = headerNames.nextElement();
 //            Enumeration<String> headers = request.getHeaders(name);
@@ -56,29 +87,4 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
 //                System.out.println();
 //            }
 //        }
-        String ticket = CookieUtil.getValue(request, "ticket");
-        if (ticket != null) {
-            LoginTicket loginTicket = userService.findLoginTicket(ticket);
-            if (loginTicket != null && loginTicket.getStatus() == 0 && loginTicket.getExpired().after(new Date())) {
-                User user = userService.findUserById(loginTicket.getUserId());
-                //本次请求中持有用户
-                hostHolder.setUser(user);
-            }
-        }
-        return true;
-    }
-
-    //模板前
-    @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {
-        User user = hostHolder.getUser();
-        if (user != null && modelAndView != null) {
-            modelAndView.addObject("loginUser", user);
-        }
-    }
-
-    @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
-        hostHolder.clearUser();
-    }
 }

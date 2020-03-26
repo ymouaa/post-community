@@ -19,6 +19,4 @@ public class TestTrieTree {
         System.out.println(builder);
         System.out.println(builder.toString());*/
     }
-
-
 }

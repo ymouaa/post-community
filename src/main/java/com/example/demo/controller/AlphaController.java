@@ -133,6 +133,32 @@ public class AlphaController {
         return DemoUtil.getJSONString(0, "操作成功!");
     }
 
+
+    @RequestMapping(path = "/test", method = RequestMethod.GET)
+    public String testTemplate(Model model) {
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        Map<String, Object> m1 = new HashMap<>();
+        m1.put("status", 0);
+
+
+        Map<String, Object> m2 = new HashMap<>();
+        m2.put("status", 1);
+
+        Map<String, Object> m3 = new HashMap<>();
+        m3.put("status", 2);
+
+        list.add(m1);
+        list.add(m2);
+        list.add(m3);
+
+
+        model.addAttribute("data", 111);
+        model.addAttribute("innerdata", 222);
+        model.addAttribute("statuslist", list);
+        return "/demo/testTemplate";
+    }
+
 }
 
 
