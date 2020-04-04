@@ -3,13 +3,14 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--suppress ALL -->
-<mapper namespace="com.example.demo.dao.CommentMapper">
+<mapper namespace="com.ang.springboot_es.dao.CommentMapper">
     <sql id="selectFields">
         id,user_id,entity_type,entity_id,target_id,content,status,create_time
     </sql>
     <sql id="insertFields">
         user_id,entity_type,entity_id,target_id,content,status,create_time
     </sql>
+
     <select id="selectByEntity" resultType="Comment">
         select
         <include refid="selectFields"></include>

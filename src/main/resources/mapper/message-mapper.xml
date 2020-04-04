@@ -3,7 +3,14 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <!--suppress ALL -->
-<mapper namespace="com.example.demo.dao.MessageMapper">
+
+<!--
+status
+    0:未读
+    1:已读
+    2:删除
+-->
+<mapper namespace="com.ang.springboot_es.dao.MessageMapper">
     <sql id="selectFields">
         id,from_id,to_id,conversation_id,content,status,create_time
     </sql>
@@ -110,6 +117,9 @@
 
     <!--2表示删除-->
     <!--系统通知 from_id为1-->
+    <!--
+        查询某个主题下的最新通知
+    -->
     <select id="selectLatestNotice" resultType="Message">
         select
         <include refid="selectFields"></include>
@@ -124,8 +134,12 @@
         ) limit 1
     </select>
 
+
+    <!--
+        查询某一个主题下的通知数量
+    -->
     <select id="selectNoticeCount" resultType="int">
-        select count(id)
+        select count(*)
         from message
         where status != 2
         and from_id = 1
@@ -133,8 +147,14 @@
         and conversation_id = #{topic}
     </select>
 
+    <!--0 表示未读-->
+    <!--
+        未读的通知数量
+        不传topic为所有主题的未读通知的总数
+        传topic为某一主题的未读通知的总数
+    -->
     <select id="selectUnreadCount" resultType="int">
-        select count(id)
+        select count(*)
         from message
         where status = 0
         and from_id = 1
@@ -143,8 +163,6 @@
             and conversation_id = #{topic}
         </if>
     </select>
-    <!--0 表示未读-->
-    <!-- 查询所有主题通知总数 可以用这一个 不传topic 就行，查所有的主题-->
 
 
     <select id="selectNotices" resultType="Message">
