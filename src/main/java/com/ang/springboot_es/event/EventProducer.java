@@ -17,4 +17,6 @@ public class EventProducer {
         // 将事件发布到指定的主题
         kafkaTemplate.send(event.getTopic(), JSONObject.toJSONString(event));
     }
+
+
 }

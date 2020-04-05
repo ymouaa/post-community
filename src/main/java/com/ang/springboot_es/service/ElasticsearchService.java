@@ -1,11 +1,9 @@
-package com.ang.springboot_es;
+package com.ang.springboot_es.service;
 
-
-import com.ang.springboot_es.dao.DiscussPostMapper;
 import com.ang.springboot_es.dao.DiscussPostRepository;
-import com.ang.springboot_es.dao.UserMapper;
 import com.ang.springboot_es.entity.DiscussPost;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -13,10 +11,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,150 +21,56 @@ import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
 import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@ContextConfiguration(classes = SpringbootEsApplication.class)
-public class TestEs {
-
-
-    @Autowired
-    private DiscussPostMapper postMapper;
+@Service
+public class ElasticsearchService {
 
     @Autowired
     private DiscussPostRepository postRepository;
 
-
-    @Autowired
-    private UserMapper userMapper;
-
-    @Test
-    public void testMapper() {
-        List<DiscussPost> list = postMapper.selectDiscussPost(149, 0, Integer.MAX_VALUE);
-        for (DiscussPost post : list) {
-            System.out.println(post);
-        }
-
-    }
-
-    @Test
-    public void testEs() {
-        DiscussPost post = postMapper.selectDiscussPostById(120);
-        postRepository.save(post);
-
-
-    }
-
-
-    @Test
-    public void testSearch() {
-        Optional<DiscussPost> byId = postRepository.findById(120);
-        DiscussPost post = byId.get();
-        System.out.println(post);
-    }
-
-
-
-
-    @Test
-    public void search() {
-        SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(QueryBuilders.multiMatchQuery("互联网", "title", "content"))
-                .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))
-                .withSort(SortBuilders.fieldSort("score").order(SortOrder.DESC))
-                .withSort(SortBuilders.fieldSort("createTime").order(SortOrder.DESC))
-                .withPageable(PageRequest.of(0, 10))
-                .withHighlightFields(
-                        new HighlightBuilder.Field("title").preTags("<em>").postTags("</em>"),
-                        new HighlightBuilder.Field("title").preTags("<em>").postTags("</em>")
-                ).build();
-        template.queryForPage(searchQuery, DiscussPost.class, new SearchResultMapper() {
-            @Override
-            public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
-                System.out.println(response.toString());
-                System.out.println("==============");
-                return null;
-            }
-        });
-    }
-
-
-    /**
-     * 构造搜索条件
-     * 高亮，分页....
-     */
-    @Test
-    public void test() {
-        SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(QueryBuilders.multiMatchQuery("互联网寒冬", "title", "content"))
-                .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))
-                .withSort(SortBuilders.fieldSort("score").order(SortOrder.DESC))
-                .withSort(SortBuilders.fieldSort("createTime").order(SortOrder.DESC))
-                .withPageable(PageRequest.of(0, 10))
-                .withHighlightFields(
-                        new HighlightBuilder.Field("title").preTags("<em>").postTags("</em>"),
-                        new HighlightBuilder.Field("title").preTags("<em>").postTags("</em>")
-                ).build();
-        Page<DiscussPost> page = postRepository.search(searchQuery);
-        for (DiscussPost post : page) {
-            System.out.println(post);
-        }
-    }
-    //排序
-    // type status score
-    //type 置顶
-    //status 加精
-    // 上面合算到score
-    // create_time'
-
-    // 分页  不然一次数据太多 page size
-    // 高亮  那些字段    什么标签
-    // new HighlightBuilder.Field("title","<em>","</em>")
-    //.new HighlightBuilder.Field("content","<em>","</em>")
-    // ,build();
-
-
-    @Test
-    public void testFindAll() {
-        Iterable<DiscussPost> all = postRepository.findAll();
-        for (DiscussPost post : all) {
-            System.out.println(post);
-        }
-    }
-
-
     @Autowired
     private ElasticsearchTemplate template;
 
-    @Test
-    public void testHigh() {
+
+    public void save(DiscussPost post) {
+        postRepository.save(post);
+    }
+
+    public void deleteDiscussPost(int id) {
+        postRepository.deleteById(id);
+    }
+
+    public Page<DiscussPost> search(String keyword, int currentPage, int limit) {
+        // 构造查询的条件
+        // title content
+        // type score time
+        // page 分页
+
+
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
-                .withQuery(QueryBuilders.multiMatchQuery("互联网", "title", "content"))
+                .withQuery(QueryBuilders.multiMatchQuery(keyword, "title", "content"))
                 .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))
                 .withSort(SortBuilders.fieldSort("score").order(SortOrder.DESC))
                 .withSort(SortBuilders.fieldSort("createTime").order(SortOrder.DESC))
-                .withPageable(PageRequest.of(0, 10))
+                .withPageable(PageRequest.of(currentPage, limit))
                 .withHighlightFields(
                         new HighlightBuilder.Field("title").preTags("<em>").postTags("</em>"),
                         new HighlightBuilder.Field("content").preTags("<em>").postTags("</em>")
                 ).build();
-        Page<DiscussPost> page = template.queryForPage(searchQuery, DiscussPost.class, new SearchResultMapper() {
 
+        return template.queryForPage(searchQuery, DiscussPost.class, new SearchResultMapper() {
 
-            @SuppressWarnings("Duplicates")
             @Override
             public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> clazz, Pageable pageable) {
 
                 SearchHits hits = response.getHits();
-                String s = response.toString();
-                System.out.println(s);
+
                 if (hits.getTotalHits() <= 0) {
                     return null;
                 }
@@ -223,14 +124,9 @@ public class TestEs {
                 return new AggregatedPageImpl(list, pageable
                         , hits.getTotalHits(), response.getAggregations(),
                         response.getScrollId(), hits.getMaxScore());
+
             }
         });
-
-        for (DiscussPost post : page) {
-            System.out.println(post);
-        }
-
-
     }
 
 

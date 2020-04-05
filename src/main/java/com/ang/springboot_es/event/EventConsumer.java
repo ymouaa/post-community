@@ -2,8 +2,12 @@ package com.ang.springboot_es.event;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.ang.springboot_es.dao.DiscussPostMapper;
+import com.ang.springboot_es.entity.DiscussPost;
 import com.ang.springboot_es.entity.Event;
 import com.ang.springboot_es.entity.Message;
+import com.ang.springboot_es.service.DiscussPostService;
+import com.ang.springboot_es.service.ElasticsearchService;
 import com.ang.springboot_es.service.MessageService;
 import com.ang.springboot_es.util.DemoConstant;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -24,6 +28,12 @@ public class EventConsumer implements DemoConstant {
 
     @Autowired
     private MessageService messageService;
+
+    @Autowired
+    public DiscussPostService postService;
+
+    @Autowired
+    public ElasticsearchService elasticsearchService;
 
     @KafkaListener(topics = {TOPIC_LIKE, TOPIC_COMMENT, TOPIC_FOLLOW})
     public void handleCommentMessages(ConsumerRecord record) {
@@ -59,4 +69,23 @@ public class EventConsumer implements DemoConstant {
         messageService.addMessage(message);
 
     }
+
+
+    @KafkaListener(topics = {TOPIC_PUBLISH})
+    public void handleHandlePublishMessages(ConsumerRecord record) {
+        if(record==null||record.value()==null){
+            logger.error("消息的内容为空！");
+            return;
+        }
+        // json->object
+        Event event = JSONObject.parseObject(record.value().toString(), Event.class);
+        if (event == null) {
+            logger.error("消息格式错误！");
+            return;
+        }
+        int id = event.getEntityId();
+        DiscussPost post = postService.findDiscussPostById(id);
+        elasticsearchService.save(post);
+    }
+
 }

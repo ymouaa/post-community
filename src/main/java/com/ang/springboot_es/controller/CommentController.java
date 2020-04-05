@@ -62,6 +62,17 @@ public class CommentController implements DemoConstant {
         }
         eventProducer.fireEvent(event);
 
+        // 只有评论了贴子才触发发帖事件
+        if(comment.getEntityType()==ENTITY_TYPE_DISCUSSPOST){
+            event = new Event();
+            event.setTopic(TOPIC_PUBLISH);
+            event.setUserId(comment.getUserId());
+            event.setEntityId(discussPostId);
+            event.setEntityType(ENTITY_TYPE_DISCUSSPOST);
+            eventProducer.fireEvent(event);
+        }
+
+
         return "redirect:/discuss/detail/" + discussPostId;
     }
 }

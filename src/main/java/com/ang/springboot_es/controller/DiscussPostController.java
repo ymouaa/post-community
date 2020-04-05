@@ -1,10 +1,8 @@
 package com.ang.springboot_es.controller;
 
 
-import com.ang.springboot_es.entity.Comment;
-import com.ang.springboot_es.entity.DiscussPost;
-import com.ang.springboot_es.entity.Page;
-import com.ang.springboot_es.entity.User;
+import com.ang.springboot_es.entity.*;
+import com.ang.springboot_es.event.EventProducer;
 import com.ang.springboot_es.service.CommentService;
 import com.ang.springboot_es.service.DiscussPostService;
 import com.ang.springboot_es.service.LikeService;
@@ -41,6 +39,9 @@ public class DiscussPostController implements DemoConstant {
     @Autowired
     private LikeService likeService;
 
+    @Autowired
+    private EventProducer producer;
+
     /**
      * 发布帖子
      *
@@ -61,6 +62,18 @@ public class DiscussPostController implements DemoConstant {
         discussPost.setTitle(title);
         discussPost.setCreateTime(new Date());
         discussPostService.addDiscussPost(discussPost);
+
+
+        //发帖事件
+        Event event = new Event();
+        event.setTopic(TOPIC_PUBLISH);
+        event.setUserId(user.getId());
+        event.setEntityId(discussPost.getId());
+        event.setEntityType(ENTITY_TYPE_DISCUSSPOST);
+
+        producer.fireEvent(event);
+
+
         // 报错的情况,将来统一处理.
         return DemoUtil.getJSONString(0, "发布成功");
     }
