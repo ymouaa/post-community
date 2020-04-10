@@ -88,4 +88,23 @@ public class EventConsumer implements DemoConstant {
         elasticsearchService.save(post);
     }
 
+
+
+    @KafkaListener(topics = {TOPIC_PUBLISH})
+    public void handleHandleDeleteMessages(ConsumerRecord record) {
+        if(record==null||record.value()==null){
+            logger.error("消息的内容为空！");
+            return;
+        }
+        Event event = JSONObject.parseObject(record.value().toString(), Event.class);
+        if (event == null) {
+            logger.error("消息格式错误！");
+            return;
+        }
+        int id = event.getEntityId();
+        elasticsearchService.deleteDiscussPost(id);
+    }
+
+
+
 }

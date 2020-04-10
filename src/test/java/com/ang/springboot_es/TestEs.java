@@ -2,7 +2,7 @@ package com.ang.springboot_es;
 
 
 import com.ang.springboot_es.dao.DiscussPostMapper;
-import com.ang.springboot_es.dao.DiscussPostRepository;
+import com.ang.springboot_es.dao.repository.DiscussPostRepository;
 import com.ang.springboot_es.dao.UserMapper;
 import com.ang.springboot_es.entity.DiscussPost;
 import org.elasticsearch.action.search.SearchResponse;

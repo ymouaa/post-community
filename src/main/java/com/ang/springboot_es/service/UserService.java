@@ -1,7 +1,6 @@
 package com.ang.springboot_es.service;
 
 
-
 import com.ang.springboot_es.dao.UserMapper;
 import com.ang.springboot_es.entity.LoginTicket;
 import com.ang.springboot_es.entity.User;
@@ -13,14 +12,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 
@@ -250,14 +247,30 @@ public class UserService implements DemoConstant {
     查询缓存
     初始化缓存
     删除缓存
-
-   1.缓存用户
-
-   2.没有再到mysql中查
-
-   3.修改数据时，删除缓存
-
+    1.缓存用户
+    2.没有再到mysql中查
+    3.修改数据时，删除缓存
     */
 
+
+    public Collection<? extends GrantedAuthority> getAuthority(int userId) {
+        User user = this.findUserById(userId);
+
+        List<GrantedAuthority>list =new ArrayList<>();
+        list.add(new GrantedAuthority() {
+            @Override
+            public String getAuthority() {
+                switch (user.getType()) {
+                    case 1:
+                        return AUTHORITY_ADMIN;
+                    case 2:
+                        return AUTHORITY_MODERATOR;
+                    default:
+                        return AUTHORITY_USER;
+                }
+            }
+        });
+        return list;
+    }
 
 }

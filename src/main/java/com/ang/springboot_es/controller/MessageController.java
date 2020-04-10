@@ -165,14 +165,17 @@ public class MessageController implements DemoConstant {
         return DemoUtil.getJSONString(0);
     }
 
+
+
+
     @RequestMapping(path = "/notice/list", method = RequestMethod.GET)
     public String getNoticeList(Model model) {
         User user = hostHolder.getUser();
 
         Message latestComment = messageService.findLatestNotice(user.getId(), TOPIC_COMMENT);
-        Map<String, Object> noticeVo = new HashMap<>();
 
         if (latestComment != null) {
+            Map<String, Object> noticeVo = new HashMap<>();
             noticeVo.put("message", latestComment);
             // 字符
             String content = HtmlUtils.htmlUnescape(latestComment.getContent());
@@ -185,13 +188,13 @@ public class MessageController implements DemoConstant {
             noticeVo.put("count", messageService.findNoticeCount(user.getId(), TOPIC_COMMENT));
 
             noticeVo.put("unread", messageService.findUnreadNoticeCount(user.getId(), TOPIC_COMMENT));
+            model.addAttribute("commentNotice", noticeVo);
         }
-        model.addAttribute("commentNotice", noticeVo);
 
 
         Message latestLike = messageService.findLatestNotice(user.getId(), TOPIC_LIKE);
-        noticeVo = new HashMap<>();
         if (latestLike != null) {
+            Map<String, Object> noticeVo = new HashMap<>();
             noticeVo.put("message", latestLike);
             // 字符
             String content = HtmlUtils.htmlUnescape(latestLike.getContent());
@@ -204,13 +207,13 @@ public class MessageController implements DemoConstant {
             noticeVo.put("count", messageService.findNoticeCount(user.getId(), TOPIC_LIKE));
 
             noticeVo.put("unread", messageService.findUnreadNoticeCount(user.getId(), TOPIC_LIKE));
+            model.addAttribute("likeNotice", noticeVo);
         }
-        model.addAttribute("likeNotice", noticeVo);
 
 
         Message latestFollow = messageService.findLatestNotice(user.getId(), TOPIC_FOLLOW);
-        noticeVo = new HashMap<>();
         if (latestFollow != null) {
+            Map<String, Object> noticeVo = new HashMap<>();
             noticeVo.put("message", latestFollow);
             // 字符
             String content = HtmlUtils.htmlUnescape(latestFollow.getContent());
@@ -221,8 +224,8 @@ public class MessageController implements DemoConstant {
             noticeVo.put("count", messageService.findNoticeCount(user.getId(), TOPIC_FOLLOW));
 
             noticeVo.put("unread", messageService.findUnreadNoticeCount(user.getId(), TOPIC_FOLLOW));
+            model.addAttribute("followNotice", noticeVo);
         }
-        model.addAttribute("followNotice", noticeVo);
 
         // 查询未读消息
         int letterUnreadCount = messageService.findUnreadLetterCount(null, user.getId());

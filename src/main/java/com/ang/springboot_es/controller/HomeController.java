@@ -37,6 +37,16 @@ public class HomeController implements DemoConstant {
     @Autowired
     private HostHolder hostHolder;
 
+    @RequestMapping(path = "/error", method = RequestMethod.GET)
+    public String getErrorPage() {
+        return "/error/500";
+    }
+
+    @RequestMapping(path = "/denied",method = RequestMethod.GET)
+    public String getDeniedPage(){
+        return "/error/404";
+    }
+
     @RequestMapping(path = "/index", method = RequestMethod.GET)
     public String getIndexPage(Model model, Page page) {
         //page自动放到Model中 thymeleaf中可以直接用
@@ -70,9 +80,5 @@ public class HomeController implements DemoConstant {
         return "/index";
     }
 
-    @RequestMapping(path = "/error", method = RequestMethod.GET)
-    public String getErrorPage() {
-        return "/error/500";
-    }
 
 }

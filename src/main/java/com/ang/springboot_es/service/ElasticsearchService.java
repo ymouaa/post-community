@@ -1,9 +1,8 @@
 package com.ang.springboot_es.service;
 
-import com.ang.springboot_es.dao.DiscussPostRepository;
+import com.ang.springboot_es.dao.repository.DiscussPostRepository;
 import com.ang.springboot_es.entity.DiscussPost;
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class ElasticsearchService {

@@ -1,4 +1,4 @@
-package com.ang.springboot_es.dao;
+package com.ang.springboot_es.dao.repository;
 
 import com.ang.springboot_es.entity.DiscussPost;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;

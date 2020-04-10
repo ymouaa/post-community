@@ -13,6 +13,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -138,6 +144,7 @@ public class LoginController implements DemoConstant{
      */
     @RequestMapping(path = "/logout",method = RequestMethod.GET)
     public String logout(@CookieValue("ticket") String ticket){
+        SecurityContextHolder.clearContext();
         userService.logout(ticket);
         return "redirect:/login";
     }
@@ -186,6 +193,5 @@ public class LoginController implements DemoConstant{
         }
 
     }
-
 }
 

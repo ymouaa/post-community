@@ -13,10 +13,7 @@ import com.ang.springboot_es.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 
@@ -170,5 +167,49 @@ public class DiscussPostController implements DemoConstant {
         model.addAttribute("comments", commentVoList);
         return "/site/discuss-detail";
     }
+
+    // type 0 普通    1 置顶
+    // status 0 正常  1 精华   2 拉黑
+    @RequestMapping(value = "/top", method = RequestMethod.POST)
+    @ResponseBody
+    public String setTop(int id) {
+        discussPostService.updateType(id, 1);
+        Event event = new Event().setUserId(hostHolder.getUser().getId())
+                .setEntityType(ENTITY_TYPE_DISCUSSPOST)
+                .setEntityId(id)
+                .setTopic(TOPIC_PUBLISH);
+
+        producer.fireEvent(event);
+
+
+        return DemoUtil.getJSONString(0);
+    }
+
+    @RequestMapping(value = "/wonderful", method = RequestMethod.POST)
+    @ResponseBody
+    public String setWonderful(int id) {
+        discussPostService.updateStatus(id, 1);
+        Event event = new Event().setUserId(hostHolder.getUser().getId())
+                .setEntityType(ENTITY_TYPE_DISCUSSPOST)
+                .setEntityId(id)
+                .setTopic(TOPIC_PUBLISH);
+        producer.fireEvent(event);
+        return DemoUtil.getJSONString(0);
+    }
+
+
+    @RequestMapping(value = "/delete", method = RequestMethod.POST)
+    @ResponseBody
+    public String setDelete(int id) {
+        discussPostService.updateStatus(id, 2);
+        Event event = new Event().setUserId(hostHolder.getUser().getId())
+                .setEntityType(ENTITY_TYPE_DISCUSSPOST)
+                .setEntityId(id)
+                .setTopic(TOPIC_DELETE);
+        producer.fireEvent(event);
+
+        return DemoUtil.getJSONString(0);
+    }
+
 
 }
