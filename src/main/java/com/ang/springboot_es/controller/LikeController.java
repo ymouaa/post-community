@@ -11,7 +11,9 @@ import com.ang.springboot_es.service.LikeService;
 import com.ang.springboot_es.util.DemoConstant;
 import com.ang.springboot_es.util.DemoUtil;
 import com.ang.springboot_es.util.HostHolder;
+import com.ang.springboot_es.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,6 +40,9 @@ public class LikeController implements DemoConstant {
     @Autowired
     private EventProducer eventProducer;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     @RequestMapping(path = "/like", method = RequestMethod.POST)
     @ResponseBody
     public String like(int entityType, int entityId, int entityUserId, int postId) {
@@ -55,18 +60,25 @@ public class LikeController implements DemoConstant {
         map.put("likeStatus", likeStatus);
 
         if (likeStatus == 1) {
-            // 触发点赞事件
-            Event event = new Event().setTopic(TOPIC_LIKE)
-                    .setUserId(user.getId())
-                    .setEntityType(entityType)
-                    .setEntityId(entityId)
-                    .setEntityUserId(entityUserId)
-                    // 不管是点赞的是帖子还是评论 都可以跳到帖子的详情页面
-                    .setData("postId", postId);
+            // 触发点赞事件 自己赞自己不发通知
+            if(user.getId()!=entityUserId){
+                Event event = new Event().setTopic(TOPIC_LIKE)
+                        .setUserId(user.getId())
+                        .setEntityType(entityType)
+                        .setEntityId(entityId)
+                        .setEntityUserId(entityUserId)
+                        // 不管是点赞的是帖子还是评论 都可以跳到帖子的详情页面
+                        .setData("postId", postId);
 
-            eventProducer.fireEvent(event);
+                eventProducer.fireEvent(event);
+            }
         }
 
+
+        if(entityType==ENTITY_TYPE_DISCUSSPOST){
+            String redisKey= RedisKeyUtil.getPostKey();
+            redisTemplate.opsForSet().add(redisKey,postId);
+        }
 
         return DemoUtil.getJSONString(0, null, map);
 

@@ -6,9 +6,9 @@
 	<link rel="icon" href="https://static.nowcoder.com/images/logo_87_87.png"/>
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
 	<link rel="stylesheet" th:href="@{/css/global.css}" />
-	<title>牛客网-首页</title>
+	<title>瓢瓢社区<!--牛客网-首页--></title>
 </head>
-<body>	
+<body>
 	<div class="nk-container">
 		<!-- 头部 -->
 		<header class="bg-dark sticky-top" th:fragment="header">
@@ -27,8 +27,8 @@
 								<a class="nav-link" th:href="@{/index}">首页</a>
 							</li>
 							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser!=null}">
-                                <a class="nav-link position-relative" th:href="@{/letter/list}">消息<span
-                                        class="badge badge-danger">12</span></a>
+                                <a class="nav-link position-relative" th:href="@{/letter/list}">消息
+									<span class="badge badge-danger" th:if="${totalCount!=0}" th:text="${totalCount}">12</span></a>
 							</li>
 							<li class="nav-item ml-3 btn-group-vertical">
 								<a class="nav-link" th:if="${loginUser==null}" th:href="@{/register}">注册</a>
@@ -38,7 +38,7 @@
 							</li>
 							<li class="nav-item ml-3 btn-group-vertical dropdown" th:if="${loginUser!=null}">
 								<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									<img th:src="${loginUser.headerUrl}" class="rounded-circle" style="width:30px;"/>
+									<img th:src="${loginUser.headerUrl}" class="rounded-circle" style="width:30px;height:30px;"/>
 								</a>
 								<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 									<a class="dropdown-item text-center" th:href="@{|/user/profile/${loginUser.id}|}">个人主页</a>
@@ -68,10 +68,10 @@
 					<!-- 筛选条件 -->
 					<ul class="nav nav-tabs mb-3">
 						<li class="nav-item">
-							<a class="nav-link active" href="#">最新</a>
+							<a th:class="|nav-link ${orderMode==0?'active':''}|" th:href="@{/index(orderMode=0)}">最新</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link" href="#">最热</a>
+							<a th:class="|nav-link ${orderMode==1?'active':''}|" th:href="@{/index(orderMode=1)}">最热</a>
 						</li>
 					</ul>
 					<button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal" data-target="#publishModal">我要发布</button>
@@ -118,7 +118,7 @@
 						</div>
 					</div>
 				</div>
-				
+
 				<!-- 帖子列表 -->
 				<ul class="list-unstyled">
 					<li class="media pb-3 pt-3 mb-3 border-bottom" th:each="map:${discussPosts}">
@@ -147,20 +147,23 @@
 									<li class="d-inline ml-2">回帖 <span th:text="${map.post.commentCount}">7</span></li>
 								</ul>
 							</div>
-						</div>						
+						</div>
 					</li>
 
 				</ul>
 				<!-- 分页 -->
 				<!--page的行数大于0才显示-->
 				<nav class="mt-5" th:fragment="pagination">
-					<ul class="pagination justify-content-center">
+					<ul class="pagination justify-content-center" th:if="${page.rows>0}">
 						<!-- /index?cureent=1&limit=5 -->
 						<li class="page-item">
-							<a class="page-link" th:href="@{${page.path}(current=1)}">首页</a></li>
+							<a class="page-link" th:href="@{${page.path}(current=1)}">首页</a>
+                        </li>
 						<li th:class="|page-item ${page.current==1?'disabled':''}|">
-							<a class="page-link" th:href="@{${page.path}(current=${page.current-1})}">上一页</a></li>
-						<li th:class="|page-item ${page.current==i?'active':''}|" th:each="i:${#numbers.sequence(page.from,page.to)}">
+							<a class="page-link" th:href="@{${page.path}(current=${page.current-1})}">上一页</a>
+                        </li>
+						<li th:class="|page-item ${page.current==i?'active':''}|"
+                            th:each="i:${#numbers.sequence(page.from,page.to)}">
 							<a class="page-link" th:text="${i}"
 							   th:href="@{${page.path}(current=${i})}">1
 							</a>

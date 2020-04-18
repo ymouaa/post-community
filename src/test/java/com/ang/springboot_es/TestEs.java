@@ -52,7 +52,7 @@ public class TestEs {
 
     @Test
     public void testMapper() {
-        List<DiscussPost> list = postMapper.selectDiscussPost(149, 0, Integer.MAX_VALUE);
+        List<DiscussPost> list = postMapper.selectDiscussPost(149, 0, Integer.MAX_VALUE,0);
         for (DiscussPost post : list) {
             System.out.println(post);
         }

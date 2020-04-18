@@ -10,7 +10,9 @@ import com.ang.springboot_es.service.UserService;
 import com.ang.springboot_es.util.DemoConstant;
 import com.ang.springboot_es.util.DemoUtil;
 import com.ang.springboot_es.util.HostHolder;
+import com.ang.springboot_es.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +40,9 @@ public class DiscussPostController implements DemoConstant {
 
     @Autowired
     private EventProducer producer;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 发布帖子
@@ -70,6 +75,9 @@ public class DiscussPostController implements DemoConstant {
 
         producer.fireEvent(event);
 
+
+        String redisKey= RedisKeyUtil.getPostKey();
+        redisTemplate.opsForSet().add(redisKey,discussPost.getId());
 
         // 报错的情况,将来统一处理.
         return DemoUtil.getJSONString(0, "发布成功");
@@ -194,6 +202,11 @@ public class DiscussPostController implements DemoConstant {
                 .setEntityId(id)
                 .setTopic(TOPIC_PUBLISH);
         producer.fireEvent(event);
+
+
+        String redisKey= RedisKeyUtil.getPostKey();
+        redisTemplate.opsForSet().add(redisKey,id);
+
         return DemoUtil.getJSONString(0);
     }
 

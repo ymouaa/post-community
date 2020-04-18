@@ -8,6 +8,9 @@ import com.ang.springboot_es.service.UserService;
 import com.ang.springboot_es.util.DemoConstant;
 import com.ang.springboot_es.util.DemoUtil;
 import com.ang.springboot_es.util.HostHolder;
+import com.qiniu.util.Auth;
+import com.qiniu.util.Md5;
+import com.qiniu.util.StringMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletOutputStream;
@@ -57,10 +57,60 @@ public class UserController implements DemoConstant {
     private FollowSerivce followSerivce;
 
 
+    @Value("${qiniu.ak}")
+    private String accessKey;
+
+    @Value("${qiniu.sk}")
+    private String secretKey;
+
+
+    @Value("${qiniu.bucket.header.name}")
+    private String headerBucketname;
+
+    @Value("${qiniu.bucket.header.url}")
+    private String headerUrl;
+
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
-    public String getSettingPage() {
+    public String getSettingPage(Model model) {
+        // 文件名
+        String filename=DemoUtil.generateUUID();
+
+
+        // 响应结果
+        StringMap putPolicy = new StringMap();
+        putPolicy.put("returnBody", DemoUtil.getJSONString(0));
+
+        // 上传凭证
+        Auth auth = Auth.create(accessKey, secretKey);
+        String uploadToken = auth.uploadToken(headerBucketname, filename, 600, putPolicy);
+
+        model.addAttribute("uploadToken",uploadToken);
+        model.addAttribute("filename",filename);
+
         return "/site/setting";
     }
+
+
+
+    // 跟新路径
+    @RequestMapping(value = "/header/url",method = RequestMethod.POST)
+    @ResponseBody
+    public String updateHeaderUrl(String filename,Model model){
+        if(StringUtils.isBlank(filename)){
+            model.addAttribute("error","您还没有选择图片");
+            return "/site/setting";
+        }
+
+        String url=headerUrl+"/"+filename;
+
+        userService.updateHeader(hostHolder.getUser().getId(),url);
+
+        return DemoUtil.getJSONString(0);
+    }
+
+
+
+
 
 
     //存储文件
@@ -135,7 +185,7 @@ public class UserController implements DemoConstant {
             model.addAttribute("repwdMsg", "确认密码不能为空");
             return "/site/setting";
         }
-        if (!StringUtils.equals(newpassword, repassword)) {
+        if (StringUtils.equals(newpassword, repassword)) {
             model.addAttribute("newpwdMsg", "新密码和旧密码不能相同");
             return "/site/setting";
         }

@@ -24,7 +24,7 @@ import java.io.PrintWriter;
 * */
 
 //只扫描加了Controller注解的类
-//@ControllerAdvice(annotations = Controller.class)
+@ControllerAdvice(annotations = Controller.class)
 public class ExceptionAdvice {
 
     private static final Logger logger = LoggerFactory.getLogger(ExceptionAdvice.class);
@@ -35,7 +35,6 @@ public class ExceptionAdvice {
         for (StackTraceElement element : e.getStackTrace()) {
             logger.error(element.toString());
         }
-
         //异步请求
         //返回Json
         String xRequestedWith = request.getHeader("x-requested-with");

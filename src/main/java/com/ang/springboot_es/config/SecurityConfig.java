@@ -68,6 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements Demo
                 ).hasAnyAuthority(AUTHORITY_MODERATOR)
                 .antMatchers(
                         "/discuss/delete"
+                        ,"/data/**"
                 ).hasAnyAuthority(AUTHORITY_ADMIN)
                 .anyRequest().permitAll();
         // 权限不够时的处理

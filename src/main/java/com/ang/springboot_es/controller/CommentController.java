@@ -8,7 +8,9 @@ import com.ang.springboot_es.service.CommentService;
 import com.ang.springboot_es.service.DiscussPostService;
 import com.ang.springboot_es.util.DemoConstant;
 import com.ang.springboot_es.util.HostHolder;
+import com.ang.springboot_es.util.RedisKeyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +35,9 @@ public class CommentController implements DemoConstant {
     @Autowired
     private DiscussPostService discussPostService;
 
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     /**
      * 回复帖子
@@ -70,8 +75,11 @@ public class CommentController implements DemoConstant {
             event.setEntityId(discussPostId);
             event.setEntityType(ENTITY_TYPE_DISCUSSPOST);
             eventProducer.fireEvent(event);
-        }
 
+
+            String redisKey= RedisKeyUtil.getPostKey();
+            redisTemplate.opsForSet().add(redisKey,discussPostId);
+        }
 
         return "redirect:/discuss/detail/" + discussPostId;
     }

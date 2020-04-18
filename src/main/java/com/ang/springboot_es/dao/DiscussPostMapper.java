@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper
 public interface DiscussPostMapper {
     //用户个人主页 我的帖子
-    List<DiscussPost> selectDiscussPost(@Param("userId") int userId, @Param("offset") int offset, @Param("limit") int limit);
+    List<DiscussPost> selectDiscussPost(@Param("userId") int userId, @Param("offset") int offset, @Param("limit") int limit,@Param("orderMode")int orderMode);
 
     int selectDiscussPostRows(@Param("userId") int userId);
 
@@ -24,6 +24,8 @@ public interface DiscussPostMapper {
     int updateType(@Param("id") int id, @Param("type") int type);
 
     int updateStatus(@Param("id") int id, @Param("status") int status);
+
+    int updateScore(@Param("id")int id,@Param("score")double score);
 
 }
 
