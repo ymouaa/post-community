@@ -4,7 +4,9 @@ import com.ang.springboot_es.controller.Interceptor.AlphaInterceptor;
 import com.ang.springboot_es.controller.Interceptor.DataInterceptor;
 import com.ang.springboot_es.controller.Interceptor.LoginTicketInterceptor;
 import com.ang.springboot_es.controller.Interceptor.MessageInterceptor;
+import org.jasypt.encryption.pbe.StandardPBEStringEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -53,4 +55,7 @@ public class WebMcvConfig implements WebMvcConfigurer {
                         , "/**/*.jpeg"
                         , "/**/*.jpg");
     }
+
+
+
 }

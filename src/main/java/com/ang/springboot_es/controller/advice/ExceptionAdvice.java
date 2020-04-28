@@ -35,10 +35,11 @@ public class ExceptionAdvice {
         for (StackTraceElement element : e.getStackTrace()) {
             logger.error(element.toString());
         }
-        //异步请求
-        //返回Json
+
         String xRequestedWith = request.getHeader("x-requested-with");
         if ("XMLHttpRequest".equals(xRequestedWith)) {
+            //异步请求
+            //返回Json
             response.setContentType("application/plain;charset=utf-8");
             PrintWriter writer = null;
             writer = response.getWriter();

@@ -147,7 +147,11 @@
 			<version>7.2.28</version>
 		</dependency>
 
-
+		<dependency>
+			<groupId>com.github.ulisesbocchio</groupId>
+			<artifactId>jasypt-spring-boot-starter</artifactId>
+			<version>2.1.1</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>

@@ -98,7 +98,7 @@ public class MessageController implements DemoConstant {
 //                map.put("fromUser", userService.findUserById(message.getFromId()));
 //                letters.add(map);
 //            }
-            //新的日期显示在页面最小面
+            //新的日期显示在页面最前
             for (int i = letterList.size() - 1; i >= 0; i--) {
                 Map<String, Object> map = new HashMap<>();
                 map.put("letter", letterList.get(i));
@@ -155,13 +155,12 @@ public class MessageController implements DemoConstant {
         message.setFromId(hostHolder.getUser().getId());
         message.setContent(content);
         message.setCreateTime(new Date());
-        if (message.getFromId() < message.getToId()) {
-            message.setConversationId(message.getFromId() + "_" + message.getToId());
-        } else {
-            message.setConversationId(message.getToId() + "_" + message.getFromId());
-        }
+//        if (message.getFromId() < message.getToId()) {
+//            message.setConversationId(message.getFromId() + "_" + message.getToId());
+//        } else {
+//            message.setConversationId(message.getToId() + "_" + message.getFromId());
+//        }
         messageService.addMessage(message);
-
         return DemoUtil.getJSONString(0);
     }
 

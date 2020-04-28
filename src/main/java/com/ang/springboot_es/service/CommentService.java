@@ -40,7 +40,7 @@ public class CommentService implements DemoConstant {
         return commentMapper.selectCommentById(id);
     }
 
-
+    //读提交
     @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
     public int addComment(Comment comment) {
         //过滤一下内容
@@ -53,7 +53,6 @@ public class CommentService implements DemoConstant {
 
         //更新贴子的评论数量
         if (comment.getEntityType() == ENTITY_TYPE_DISCUSSPOST) {
-            //这里没查 post.commentCount后加一
             int count = commentMapper.selectCountByEntity(comment.getEntityType(), comment.getEntityId());
             discussPostMapper.updateCommentCount(comment.getEntityId(), count);
         }

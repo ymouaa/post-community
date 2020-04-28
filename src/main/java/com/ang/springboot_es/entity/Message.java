@@ -36,7 +36,11 @@ public class Message {
     }
 
     public String getConversationId() {
-        return conversationId;
+        if(fromId>toId){
+            return toId+"_"+fromId;
+        }else {
+            return fromId+"_"+toId;
+        }
     }
 
     public void setConversationId(String conversationId) {
