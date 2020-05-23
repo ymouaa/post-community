@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -23,9 +24,16 @@ public class MessageService {
         return messageMapper.selectConversation(userId, offset, limit);
     }
 
+
     public int findConversationCount(int userId) {
         return messageMapper.selectConversationCount(userId);
     }
+
+
+    public int updateMessageStatus(int id, int status) {
+        return messageMapper.updateMessage(Arrays.asList(id), status);
+    }
+
 
     /**
      * 查询某个会话的所有消息

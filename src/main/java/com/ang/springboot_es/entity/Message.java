@@ -2,6 +2,9 @@ package com.ang.springboot_es.entity;
 
 import java.util.Date;
 
+/**
+ * 消息
+ */
 public class Message {
     private int id;
     private int fromId;
@@ -36,11 +39,7 @@ public class Message {
     }
 
     public String getConversationId() {
-        if(fromId>toId){
-            return toId+"_"+fromId;
-        }else {
-            return fromId+"_"+toId;
-        }
+        return conversationId;
     }
 
     public void setConversationId(String conversationId) {

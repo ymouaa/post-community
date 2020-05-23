@@ -2,14 +2,13 @@ package com.ang.springboot_es.controller;
 
 
 import com.ang.springboot_es.entity.User;
-import com.ang.springboot_es.service.FollowSerivce;
+import com.ang.springboot_es.service.FollowService;
 import com.ang.springboot_es.service.LikeService;
 import com.ang.springboot_es.service.UserService;
 import com.ang.springboot_es.util.DemoConstant;
 import com.ang.springboot_es.util.DemoUtil;
 import com.ang.springboot_es.util.HostHolder;
 import com.qiniu.util.Auth;
-import com.qiniu.util.Md5;
 import com.qiniu.util.StringMap;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -54,7 +53,7 @@ public class UserController implements DemoConstant {
     private LikeService likeService;
 
     @Autowired
-    private FollowSerivce followSerivce;
+    private FollowService followService;
 
 
     @Value("${qiniu.ak}")
@@ -206,7 +205,7 @@ public class UserController implements DemoConstant {
     @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
     public String profile(@PathVariable("userId") int userId, Model model) {
         User user = userService.findUserById(userId);
-        //防止恶意攻击
+        //防止查不存在的用户
         if (user == null) {
             throw new RuntimeException("该用户不存在");
         }
@@ -218,21 +217,21 @@ public class UserController implements DemoConstant {
 
         //关注数量
 
-        long followeeCount = followSerivce.findFolloweeCount(userId, ENTITY_TYPE_USER);
+        long followeeCount = followService.findFolloweeCount(userId, ENTITY_TYPE_USER);
 
         model.addAttribute("followeeCount", followeeCount);
 
         //粉丝数量
 
 
-        long followerCount = followSerivce.findFollowerCount(ENTITY_TYPE_USER, userId);
+        long followerCount = followService.findFollowerCount(ENTITY_TYPE_USER, userId);
         model.addAttribute("followerCount", followerCount);
 
         //对当前用户是否关注
 
         boolean hasFollowed = false;
         if (hostHolder.getUser() != null) {
-            hasFollowed = followSerivce.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
+            hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
         }
         model.addAttribute("hasFollowed", hasFollowed);
 

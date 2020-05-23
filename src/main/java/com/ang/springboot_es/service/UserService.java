@@ -44,7 +44,7 @@ public class UserService implements DemoConstant {
     private String domain;
 
 
-    //项目路径
+    //访问路径
     @Value("${server.servlet.context-path}")
     private String contextPath;
 
@@ -60,7 +60,6 @@ public class UserService implements DemoConstant {
     //返回注册的结果
     //比如用户名重复
     //邮箱已注册
-    //。。。。
     public Map<String, Object> register(User user) {
         Map<String, Object> map = new HashMap<>();
 
@@ -106,20 +105,18 @@ public class UserService implements DemoConstant {
         user.setHeaderUrl(String.format("http://images.nowcoder.com/head/%dt.png", new Random().nextInt(1000)));
 
         user.setCreateTime(new Date());
-        //入库
         userMapper.insertUser(user);
-        //发邮件啦
+        //发邮件
 
-        //模板是谁？
-        //需要什么参数
+        //模板
         //在templates/mail/activation.html
         Context context = new Context();      //org.thymeleaf.context;
         context.setVariable("email", user.getEmail());
         String url = domain + contextPath + "/activationcode/" + user.getId() + "/" + user.getActivationCode();
         context.setVariable("url", url);
-//http://localhost:8080/demo/activation/101/code
+        // http://localhost:8080/demo/activation/101/code
         String content = templateEngine.process("/mail/activation", context);
-        //  mailClient.sendMail(user.getEmail(),"激活账号",content);
+        // mailClient.sendMail(user.getEmail(),"激活账号",content);
         new Thread(() -> mailClient.sendMail(user.getEmail(), "激活账号", content)).start();
 
         return map;
@@ -161,13 +158,8 @@ public class UserService implements DemoConstant {
         loginTicket.setExpired
                 (new Date(System.currentTimeMillis() + expiredSeconds * 1000));
         loginTicket.setTicket(DemoUtil.generateUUID());
-        //Date date = loginTicket.getExpired();
-        //String format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
         String redisKey = RedisKeyUtil.getTicketKey(loginTicket.getTicket());
-        // 退出登录时，将redis中loginTicket的status设为1
-        // 所以暂时不设置过期时间了
-        //redisTemplate.opsForValue().set(redisKey, loginTicket, expiredSeconds, TimeUnit.SECONDS);
-        //loginTicketMapper.insertTicket(loginTicket);
+        // 退出登录时，将redis中loginTicket的status设为1 不设置redis中的过期时间
         redisTemplate.opsForValue().set(redisKey, loginTicket);
         map.put("ticket", loginTicket.getTicket());
         return map;
@@ -225,7 +217,12 @@ public class UserService implements DemoConstant {
         return userMapper.selectByName(username);
     }
 
-
+    /*
+    查询缓存 初始化缓存 删除缓存
+      1.缓存用户
+      2.没有再到数据库中查
+      3.修改数据时，删除缓存
+    */
     private User initCache(int userId) {
         User user = userMapper.selectById(userId);
         String redisKey = RedisKeyUtil.getUserKey(userId);
@@ -243,16 +240,7 @@ public class UserService implements DemoConstant {
         String redisKey = RedisKeyUtil.getUserKey(userId);
         redisTemplate.delete(redisKey);
     }
-    /*
-    查询缓存
-    初始化缓存
-    删除缓存
-    1.缓存用户
-    2.没有再到mysql中查
-    3.修改数据时，删除缓存
-    */
-
-
+    // 根据用户的字段来获取权限
     public Collection<? extends GrantedAuthority> getAuthority(int userId) {
         User user = this.findUserById(userId);
 

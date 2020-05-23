@@ -31,6 +31,14 @@ function send_letter() {
 }
 
 function delete_msg() {
-    // TODO 删除数据
-    $(this).parents(".media").remove();
+        // TODO 删除数据
+        $(this).parents(".media").remove();
+        var msgId=$(this).next().val();
+        $.post(
+            CONTEXT_PATH+"/message/delete",
+            {"msgId":msgId},
+            function(data){
+
+            }
+        )
 }

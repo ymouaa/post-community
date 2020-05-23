@@ -13,7 +13,7 @@
 	<artifactId>springboot_es</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>springboot_es</name>
-	<description>Demo project for Spring Boot es</description>
+	<description>community</description>
 
 	<properties>
 		<java.version>1.8</java.version>

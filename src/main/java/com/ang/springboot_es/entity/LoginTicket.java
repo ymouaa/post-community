@@ -2,6 +2,10 @@ package com.ang.springboot_es.entity;
 
 import java.util.Date;
 
+/**
+ * 登录凭证
+ * 已用redis来存登录凭证
+ */
 public class LoginTicket {
     private int id;
     private int userId;

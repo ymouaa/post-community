@@ -7,7 +7,9 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.Date;
 
-
+/**
+ * 帖子
+ */
 @Document(indexName = "discusspost", type = "doc",useServerConfiguration = true)
 public class DiscussPost {
 

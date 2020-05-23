@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
-public class FollowSerivce implements DemoConstant {
+public class FollowService implements DemoConstant {
 
 
     @Autowired
@@ -31,14 +31,9 @@ public class FollowSerivce implements DemoConstant {
             public Object execute(RedisOperations operations) throws DataAccessException {
                 String followeeKey = RedisKeyUtil.getFolloweeKey(userId, entityType);
                 String followerKey = RedisKeyUtil.getFollowerKey(entityType, entityId);
-
-
                 operations.multi();
-
                 operations.opsForZSet().add(followeeKey, entityId, System.currentTimeMillis());
-
                 operations.opsForZSet().add(followerKey, userId, System.currentTimeMillis());
-
                 return operations.exec();
             }
         });
@@ -99,8 +94,6 @@ public class FollowSerivce implements DemoConstant {
 
             Double score = redisTemplate.opsForZSet().score(followeeKey, id);
             map.put("followTime", new Date(score.longValue()));
-//            boolean b = hasFollowed(userId, ENTITY_TYPE_USER, id);
-//            map.put("hasFollowed",b);  在视图层判断 使用hostHolder 业务层竟然没有注入这个，算一点减少耦合吧:(
             list.add(map);
         }
 

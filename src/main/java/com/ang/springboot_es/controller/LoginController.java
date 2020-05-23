@@ -106,9 +106,13 @@ public class LoginController implements DemoConstant{
                         /*,HttpSession session*/
             , Model model
             , HttpServletResponse response
-            , @CookieValue("KaptchaOwner") String kaptchaOwner) {
+            , @CookieValue(value = "KaptchaOwner",required =false) String kaptchaOwner) {
         //String kaptcha= (String) session.getAttribute("kaptcha");
         String kaptcha = null;
+        if(kaptchaOwner==null){
+            model.addAttribute("codeMsg","验证码已过期");
+            return "/site/login";
+        }
         if (kaptchaOwner != null) {
             String redisKey = RedisKeyUtil.getKaptchaKey(kaptchaOwner);
             kaptcha = (String) redisTemplate.opsForValue().get(redisKey);
@@ -120,8 +124,6 @@ public class LoginController implements DemoConstant{
         //检查账号密码
         //勾上记住，过期时间 12小时或100天 即cookie的时间
         int expiredSecond=remember?REMEMBER_EXPIRED_SECONDS:DEFALUT_EXPIRED_SECONDS;
-        //System.out.println(expiredSecond);
-        //System.out.println(expiredSecond/24/3600);
         Map<String, Object> map = userService.login(username, password, expiredSecond);
         //如果登录成功，将登录凭证通过cookie传到浏览器
         if(map.containsKey("ticket")){
@@ -161,18 +163,8 @@ public class LoginController implements DemoConstant{
 
         String owner = DemoUtil.generateUUID();
         Cookie cookie = new Cookie("KaptchaOwner", owner);
-        //Sets the maximum age in seconds for this Cookie
         // 60秒过期
         cookie.setMaxAge(60);
-
-        //Specifies a path for the cookie to which the client should return the cookie.
-        /*
-        Specifies a path for the cookie to which the client should return the cookie.
-        The cookie is visible to all the pages in the directory you specify,
-        and all the pages in that directory's subdirectories.
-        A cookie's path must include the servlet that set the cookie,
-        for example, /catalog, which makes the cookie visible to all directories on the server under /catalog.
-        */
         cookie.setPath(contextPath);
         response.addCookie(cookie);
 
@@ -182,7 +174,6 @@ public class LoginController implements DemoConstant{
 
         //验证码存入session
         //session.setAttribute("kaptcha",text);
-
         //图片输出给浏览器
         response.setContentType("image/png");
         try {

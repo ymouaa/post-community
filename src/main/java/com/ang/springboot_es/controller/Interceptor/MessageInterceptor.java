@@ -23,6 +23,8 @@ public class MessageInterceptor implements HandlerInterceptor {
     @Autowired
     private HostHolder hostHolder;
 
+
+    // 未读消息数
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {
         if(hostHolder.getUser()!=null&&modelAndView!=null){

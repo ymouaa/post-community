@@ -43,13 +43,11 @@ public class ElasticsearchService {
     public void deleteDiscussPost(int id) {
         postRepository.deleteById(id);
     }
-
+    // 构造查询的条件
+    // title content
+    // type score time
+    // page 分页
     public Page<DiscussPost> search(String keyword, int currentPage, int limit) {
-        // 构造查询的条件
-        // title content
-        // type score time
-        // page 分页
-
 
         SearchQuery searchQuery = new NativeSearchQueryBuilder()
                 .withQuery(QueryBuilders.multiMatchQuery(keyword, "title", "content"))

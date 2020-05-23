@@ -19,10 +19,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class PostScoreRefrshJob implements Job, DemoConstant {
+public class PostScoreRefreshJob implements Job, DemoConstant {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(PostScoreRefrshJob.class);
+    private static final Logger logger = LoggerFactory.getLogger(PostScoreRefreshJob.class);
 
 
     @Autowired
@@ -94,7 +94,7 @@ public class PostScoreRefrshJob implements Job, DemoConstant {
         // 更新帖子分数
         discussPostService.updateScore(postId, score);
 
-        // 同步ElasticSearch 因为它那里也用到了score排序
+        // 同步ElasticSearch 因为从es查过来是的贴子，同步score用于排序展示
         post.setScore(score);
         elasticsearchService.save(post);
 

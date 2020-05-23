@@ -155,11 +155,11 @@ public class MessageController implements DemoConstant {
         message.setFromId(hostHolder.getUser().getId());
         message.setContent(content);
         message.setCreateTime(new Date());
-//        if (message.getFromId() < message.getToId()) {
-//            message.setConversationId(message.getFromId() + "_" + message.getToId());
-//        } else {
-//            message.setConversationId(message.getToId() + "_" + message.getFromId());
-//        }
+        if (message.getFromId() < message.getToId()) {
+            message.setConversationId(message.getFromId() + "_" + message.getToId());
+        } else {
+            message.setConversationId(message.getToId() + "_" + message.getFromId());
+        }
         messageService.addMessage(message);
         return DemoUtil.getJSONString(0);
     }
@@ -227,9 +227,10 @@ public class MessageController implements DemoConstant {
         }
 
         // 查询未读消息
+        // 未读的私信数量
         int letterUnreadCount = messageService.findUnreadLetterCount(null, user.getId());
         model.addAttribute("letterUnreadCount", letterUnreadCount);
-
+        // 未读的通知数量
         int noticeUnreadCount = messageService.findUnreadNoticeCount(user.getId(), null);
         model.addAttribute("noticeUnreadCount", noticeUnreadCount);
 
@@ -278,4 +279,12 @@ public class MessageController implements DemoConstant {
         return "/site/notice-detail";
     }
 
+
+    // 删除消息
+    @RequestMapping(path = "/message/delete", method = RequestMethod.POST)
+    @ResponseBody
+    public String deleteMessage(int msgId) {
+        messageService.updateMessageStatus(msgId, 2);
+        return DemoUtil.getJSONString(0);
+    }
 }

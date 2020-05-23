@@ -4,8 +4,9 @@ package com.ang.springboot_es.util;
 import com.ang.springboot_es.entity.User;
 import org.springframework.stereotype.Component;
 
-/*
-代替session对象
+
+/**
+ * 代替session对象
  */
 @Component
 public class HostHolder {

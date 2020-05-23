@@ -2,6 +2,9 @@ package com.ang.springboot_es.entity;
 
 import java.util.Date;
 
+/**
+ * 回复
+ */
 public class Comment {
     private int id;
     private int userId;

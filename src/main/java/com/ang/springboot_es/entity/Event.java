@@ -2,7 +2,9 @@ package com.ang.springboot_es.entity;
 
 import java.util.HashMap;
 import java.util.Map;
-
+/**
+ * 事件
+ */
 public class Event {
 
     private String topic;

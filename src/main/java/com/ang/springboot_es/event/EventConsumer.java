@@ -73,7 +73,7 @@ public class EventConsumer implements DemoConstant {
     @Value("${qiniu.bucket.share.name}")
     private String shareBucketname;
 
-
+    // 点赞，评论，关注
     @KafkaListener(topics = {TOPIC_LIKE, TOPIC_COMMENT, TOPIC_FOLLOW})
     public void handleCommentMessages(ConsumerRecord record) {
         if (record == null || record.value() == null) {
@@ -109,7 +109,7 @@ public class EventConsumer implements DemoConstant {
 
     }
 
-
+    // 发布
     @KafkaListener(topics = {TOPIC_PUBLISH})
     public void handleHandlePublishMessages(ConsumerRecord record) {
         if (record == null || record.value() == null) {
@@ -123,12 +123,13 @@ public class EventConsumer implements DemoConstant {
             return;
         }
         int id = event.getEntityId();
+        // 同步到es
         DiscussPost post = postService.findDiscussPostById(id);
         elasticsearchService.save(post);
     }
 
-
-    @KafkaListener(topics = {TOPIC_PUBLISH})
+    // 删除
+    @KafkaListener(topics = {TOPIC_DELETE})
     public void handleHandleDeleteMessages(ConsumerRecord record) {
         if (record == null || record.value() == null) {
             logger.error("消息的内容为空！");
@@ -143,6 +144,7 @@ public class EventConsumer implements DemoConstant {
         elasticsearchService.deleteDiscussPost(id);
     }
 
+    // 分享
     @KafkaListener(topics = {TOPIC_SHARE})
     public void handleShareMessage(ConsumerRecord record) {
         if (record == null || record.value() == null) {

@@ -34,6 +34,8 @@ public class SearchController implements DemoConstant {
 
 
     // search?keyword=dsfs&&
+    // 搜索
+    // model:结果的排序方式 热度或时间
     @RequestMapping(value = "/search", method = RequestMethod.GET)
     public String search(String keyword, Page page, Model model) {
         //搜索帖子

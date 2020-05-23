@@ -5,7 +5,7 @@ import com.ang.springboot_es.entity.Event;
 import com.ang.springboot_es.entity.Page;
 import com.ang.springboot_es.entity.User;
 import com.ang.springboot_es.event.EventProducer;
-import com.ang.springboot_es.service.FollowSerivce;
+import com.ang.springboot_es.service.FollowService;
 import com.ang.springboot_es.service.UserService;
 import com.ang.springboot_es.util.DemoConstant;
 import com.ang.springboot_es.util.DemoUtil;
@@ -26,7 +26,7 @@ import java.util.Map;
 public class FollowerController implements DemoConstant {
 
     @Autowired
-    private FollowSerivce followSerivce;
+    private FollowService followService;
 
     @Autowired
     private HostHolder hostHolder;
@@ -45,7 +45,7 @@ public class FollowerController implements DemoConstant {
     @ResponseBody
     public String follow(int entityType, int entityId) {
         User user = hostHolder.getUser();
-        followSerivce.follow(user.getId(), entityType, entityId);
+        followService.follow(user.getId(), entityType, entityId);
 
         // 触发关注事件
         Event event = new Event().setTopic(TOPIC_FOLLOW)
@@ -65,7 +65,7 @@ public class FollowerController implements DemoConstant {
     @ResponseBody
     public String unfollow(int entityType, int entityId) {
         User user = hostHolder.getUser();
-        followSerivce.unfollow(user.getId(), entityType, entityId);
+        followService.unfollow(user.getId(), entityType, entityId);
 
         return DemoUtil.getJSONString(0, "已取消关注");
     }
@@ -86,9 +86,9 @@ public class FollowerController implements DemoConstant {
 
         page.setPath("/followees/" + userId);
         page.setLimit(10);
-        page.setRows((int) followSerivce.findFolloweeCount(userId, ENTITY_TYPE_USER));
+        page.setRows((int) followService.findFolloweeCount(userId, ENTITY_TYPE_USER));
 
-        List<Map<String, Object>> userList = followSerivce.findFollowees(userId, page.getOffset(), page.getLimit());
+        List<Map<String, Object>> userList = followService.findFollowees(userId, page.getOffset(), page.getLimit());
         if (userList != null) {
             for (Map<String, Object> map : userList) {
 
@@ -108,7 +108,7 @@ public class FollowerController implements DemoConstant {
         if (hostHolder.getUser() == null) {
             return false;
         }
-        return followSerivce.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
+        return followService.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
     }
 
 
@@ -127,9 +127,9 @@ public class FollowerController implements DemoConstant {
 
         page.setPath("/followers/" + userId);
         page.setLimit(10);
-        page.setRows((int) followSerivce.findFollowerCount(ENTITY_TYPE_USER, userId));
+        page.setRows((int) followService.findFollowerCount(ENTITY_TYPE_USER, userId));
 
-        List<Map<String, Object>> userList = followSerivce.findFollowers(userId, page.getOffset(), page.getLimit());
+        List<Map<String, Object>> userList = followService.findFollowers(userId, page.getOffset(), page.getLimit());
 
         if (userList != null) {
             for (Map<String, Object> map : userList) {
